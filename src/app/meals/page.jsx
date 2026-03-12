@@ -1,17 +1,16 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import MealSearchInput from "./components/MealSearchInput";
 
-export default function MealsPage() {
-  const [meals, setMeals] = useState([]);
-  const [search, setSearch] = useState("");
+export default async function MealsPage({searchParams}) {
+  const query = await searchParams; 
 
   const fetchMeals = async () => {
     try {
       const res = await fetch(
-        `https://www.themealdb.com/api/json/v1/1/search.php?s=${search}`,
+        `https://www.themealdb.com/api/json/v1/1/search.php?s=${query?.search}`,
       );
       const data = await res.json();
-      setMeals(data?.meals || []);
+      // setMeals(data?.meals || []);
       return data?.meals;
     } catch (error) {
       console.log(error);
@@ -19,13 +18,12 @@ export default function MealsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchMeals();
-  }, [search]);
+  const meals = await fetchMeals();
+
   return (
     <div>
       <div>
-       <input type="text" className="border border-4" value={search} onChange={(e) => setSearch(e.target.value)} /> 
+        <MealSearchInput />
       </div>
       <div className="flex flex-wrap w-11/12 mx-auto gap-2">
       {meals?.map((singleMeal) => {
@@ -38,11 +36,6 @@ export default function MealsPage() {
                   alt="Shoes"
                   className="rounded-xl"
                 />
-                <iframe
-                 className="rounded"
-                  src={`https://www.youtube.com/embed/${singleMeal?.strYoutube?.split("v=")[1]}`}
-                  title="YouTube video"
-                ></iframe>
               </figure>
               <div className="card-body items-center text-center">
                 <h2 className="card-title">{singleMeal?.strMeal}</h2>
